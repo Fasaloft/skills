@@ -1,6 +1,6 @@
 ---
 name: university-project-review
-description: Review a university student's full-stack web application project. Invoke ONLY when the user explicitly types /university-project-review — never auto-trigger this skill. Performs a comprehensive two-phase review: Phase 1 orients to the project structure and tech stack, Phase 2 evaluates 14 quality categories (component library, styling, data loading, env variables, REST API design, database design, backend layers, auth, testing, logging, error handling, security, frontend business logic separation, database transactions). Writes evidence-based findings with ✅/⚠️/❌ status and concrete recommendations to REVIEW.md in the project root. Use this skill whenever the user explicitly requests a university project review.
+description: "Review a university student's full-stack web application project. Invoke ONLY when the user explicitly types /university-project-review — never auto-trigger this skill. Performs a comprehensive two-phase review: Phase 1 orients to the project structure and tech stack, Phase 2 evaluates 14 quality categories (component library, styling, data loading, env variables, REST API design, database design, backend layers, auth, testing, logging, error handling, security, frontend business logic separation, database transactions). Writes evidence-based findings with ✅/⚠️/❌ status and concrete recommendations to REVIEW.md in the project root. Use this skill whenever the user explicitly requests a university project review."
 ---
 
 # University Project Review
