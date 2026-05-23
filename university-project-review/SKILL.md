@@ -1,6 +1,6 @@
 ---
 name: university-project-review
-description: "Review a university student's full-stack web application project. Invoke ONLY when the user explicitly types /university-project-review — never auto-trigger this skill. Performs a comprehensive two-phase review: Phase 1 orients to the project structure and tech stack, Phase 2 evaluates 14 quality categories (component library, styling, data loading, env variables, REST API design, database design, backend layers, auth, testing, logging, error handling, security, frontend business logic separation, database transactions). Writes evidence-based findings with ✅/⚠️/❌ status and concrete recommendations to REVIEW.md in the project root. Use this skill whenever the user explicitly requests a university project review."
+description: "Review a university student's full-stack web application project. Invoke ONLY when the user explicitly types /university-project-review — never auto-trigger this skill. Performs a comprehensive two-phase review: Phase 1 orients to the project structure and tech stack, Phase 2 evaluates 14 quality categories (component library, styling, data loading, env variables, REST API design, forms, frontend structure, database design, backend layers, auth, testing, logging, error handling, security). Writes evidence-based findings with ✅/⚠️/❌ status and concrete recommendations to REVIEW.md in the project root. Use this skill whenever the user explicitly requests a university project review."
 ---
 
 # University Project Review
@@ -55,7 +55,7 @@ The orientation is **descriptive only** — no pass/fail judgments.
 
 ---
 
-## Phase 2 — 12 Category Reviews
+## Phase 2 — 14 Category Reviews
 
 For each category, run the specified exploration commands, then write a section with:
 
@@ -197,7 +197,7 @@ Check for:
 
 ### 5. REST API Design
 
-Are API routes resource-oriented with correct HTTP verbs and well-defined contracts?
+Are API routes resource-oriented with correct HTTP verbs, response codes, and well-defined contracts?
 
 ```bash
 # Find route definitions (Hono, Elysia, Express, Fastify patterns)
@@ -215,6 +215,22 @@ grep -rn '"/.*get\|"/.*create\|"/.*delete\|"/.*update\|"/.*fetch\|"/.*do' \
 # Check for validation schemas (Zod, TypeBox, Valibot)
 grep -rn "z\.object\|z\.string\|Type\.Object\|v\.object" \
   --include="*.ts" . 2>/dev/null | grep -v "node_modules" | head -20
+
+# Check HTTP status codes returned
+grep -rn "\.status(\|c\.status\|statusCode\|status:" \
+  --include="*.ts" . 2>/dev/null | grep -v node_modules | head -30
+
+# Check PUT handler bodies — should send/accept whole entity
+grep -rn -A10 "\.put(" --include="*.ts" . 2>/dev/null \
+  | grep -v "node_modules\|test\|spec" | head -60
+
+# Check PATCH handler bodies — should use partial update pattern
+grep -rn -A10 "\.patch(" --include="*.ts" . 2>/dev/null \
+  | grep -v "node_modules\|test\|spec" | head -60
+
+# Check for query/search parameter usage
+grep -rn "query\.\|searchParams\.\|c\.req\.query\|req\.query" \
+  --include="*.ts" . 2>/dev/null | grep -v node_modules | head -20
 ```
 
 Check for:
@@ -222,6 +238,10 @@ Check for:
 - Resource-oriented URLs (nouns, plural): `/users`, `/posts/:id`?
 - Verbs in paths: `/getUser`, `/createPost`, `/doAction`?
 - Correct HTTP verbs: GET for reads, POST for create, PUT/PATCH for update, DELETE for delete?
+- **Response status codes** match semantics: 201 for created, 204 for no-content deletes, 400 for bad input, 404 for not found, 409 for conflict — not everything returning 200?
+- **PUT idempotency**: PUT handlers should accept and store the complete resource representation, not partial fields. A PUT called twice with the same body should leave the resource unchanged (idempotent). Students often use PUT for partial updates — flag this.
+- **PATCH semantics**: PATCH should apply a partial update. Acceptable patterns are a partial body (only fields to change) or JSON Merge Patch (RFC 7396). Flag any PATCH that replaces the whole resource (that's what PUT is for), or that uses PUT-style semantics.
+- **Query parameters**: used for filtering, sorting, pagination (`?status=active&page=2`), not for actions or IDs that belong in the path?
 - Request/response validation with Zod or similar?
 
 ---
@@ -462,9 +482,96 @@ Check for:
 
 ---
 
+### 13. Forms
+
+Are forms handled with a modern library and schema validation, rather than a tangle of `useState` calls?
+
+```bash
+# Detect form libraries
+grep -E '"react-hook-form"|"@tanstack/react-form"|"formik"|"final-form"' \
+  $(find . -name "package.json" -not -path "*/node_modules/*") 2>/dev/null
+
+# Detect validation libraries
+grep -E '"zod"|"yup"|"valibot"|"@hookform/resolvers"' \
+  $(find . -name "package.json" -not -path "*/node_modules/*") 2>/dev/null
+
+# Find useForm / useField usage
+grep -rn "useForm\|useField\|useFormContext\|Controller\b" \
+  --include="*.tsx" --include="*.ts" . 2>/dev/null | grep -v node_modules | head -20
+
+# Find form elements — do they tie back to a form library?
+grep -rn "<form\b\|onSubmit" \
+  --include="*.tsx" --include="*.jsx" . 2>/dev/null | grep -v node_modules | head -20
+
+# Red flag: many useStates that look like form fields
+grep -rn "useState" --include="*.tsx" --include="*.jsx" . 2>/dev/null \
+  | grep -v node_modules \
+  | awk -F: '{print $1}' | sort | uniq -c | sort -rn | head -10
+
+# Check for schema-based validation (Zod/Yup schemas for forms)
+grep -rn "z\.object\|yup\.object\|v\.object" \
+  --include="*.tsx" --include="*.ts" . 2>/dev/null | grep -v node_modules | head -20
+
+# Check for manual validation logic (bad pattern)
+grep -rn "if.*\.length.*===.*0\|if.*===.*''\|setError\b" \
+  --include="*.tsx" . 2>/dev/null | grep -v node_modules | head -20
+```
+
+Check for:
+
+- A form library (React Hook Form, TanStack Form, Formik) present and actually used?
+- Schema validation (Zod, Yup, Valibot) wired to the form library — not manual `if` checks?
+- **Anti-pattern: form-as-useState** — a component with 4+ `useState` calls that correspond to form fields, a manual `handleChange`, and a manual validation block is effectively a hand-rolled form library. This is a significant red flag — students should use a proper library.
+- Error messages rendered for the user (not just logged to the console)?
+- Controlled vs uncontrolled inputs: mixed usage without clear intent is a smell.
+
+---
+
+### 14. Frontend Structure
+
+Are route-level components lean orchestrators, or do they contain business logic, fetching, and rendering all tangled together?
+
+```bash
+# Find route/page component files
+find . \( -path "*/routes/*" -o -path "*/pages/*" -o -path "*/app/*" \) \
+  -name "*.tsx" -not -path "*/node_modules/*" | sort
+
+# Count lines in route/page files — large files are a god-component smell
+find . \( -path "*/routes/*" -o -path "*/pages/*" \) \
+  -name "*.tsx" -not -path "*/node_modules/*" \
+  | xargs wc -l 2>/dev/null | sort -rn | head -15
+
+# Detect TanStack Router loader usage (preferred fetch location)
+grep -rn "loader\b\|useLoaderData\|beforeLoad\|Route\.createFileRoute\|createRootRoute" \
+  --include="*.tsx" --include="*.ts" . 2>/dev/null | grep -v node_modules | head -20
+
+# Detect data fetching directly inside component bodies (outside hooks)
+grep -rn "useQuery\|useSWR\|fetch(\|axios\." \
+  --include="*.tsx" . 2>/dev/null | grep -v node_modules | head -30
+
+# Check for heavy business logic in route files
+grep -rn "\.filter(\|\.map(\|\.reduce(\|\.sort(" \
+  --include="*.tsx" . 2>/dev/null \
+  | grep -v "node_modules\|components\|hooks" \
+  | awk -F: '{print $1}' | sort | uniq -c | sort -rn | head -10
+
+# Look for custom hooks that extract logic from components
+find . -name "use*.ts" -o -name "use*.tsx" | grep -v node_modules | sort
+```
+
+Check for:
+
+- **God components**: route-level files over ~300 lines that mix fetching, transformation, and rendering are a significant problem. Read the largest files found above and assess whether they should be decomposed.
+- **Fetch placement** (when TanStack Router is used): critical data fetches should live in route `loader` functions or `beforeLoad`, not inside component bodies. This enables parallel loading and avoids loading waterfalls. Flag any `useQuery` inside a route component that could move to a loader.
+- **Page as orchestrator**: pages/routes should delegate to purpose-built sub-components and custom hooks. A route file that contains inline filter logic, sort comparisons, or multi-step data transformation is carrying logic that belongs in a service or hook.
+- **Logic/rendering separation**: are there custom `use*.ts` hooks extracting non-trivial logic out of components? A project with zero custom hooks and large page files almost certainly has mixed concerns.
+- **Component cohesion**: sub-components should be responsible for a single visual/functional unit. A component called `Dashboard` that renders a table, a chart, a form, and a sidebar is too broad.
+
+---
+
 ## Output: Write REVIEW.md
 
-After completing all 12 categories, write the full report to `REVIEW.md` in the current working directory using the Write tool. Use this exact structure:
+After completing all 14 categories, write the full report to `REVIEW.md` in the current working directory using the Write tool. Use this exact structure:
 
 ```markdown
 # Project Review: [project name from package.json "name" field or directory name]
@@ -495,6 +602,8 @@ After completing all 12 categories, write the full report to `REVIEW.md` in the 
 | Logging & Monitoring  | [emoji status] |
 | Error Handling        | [emoji status] |
 | Security              | [emoji status] |
+| Forms                 | [emoji status] |
+| Frontend Structure    | [emoji status] |
 
 Status legend: ✅ Good | ⚠️ Concerns | ❌ Issues | N/A
 
@@ -512,7 +621,7 @@ Status legend: ✅ Good | ⚠️ Concerns | ❌ Issues | N/A
 
 1. [Specific actionable item with file reference if applicable]
 
-[Repeat structure for all 12 categories]
+[Repeat structure for all 14 categories]
 ```
 
 After writing the file, tell the user:
