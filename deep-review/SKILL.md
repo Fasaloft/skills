@@ -4,7 +4,8 @@ description: |
   Use when reviewing pull requests or merge requests or code changes — PR/MR reviews, code review,
   architecture reviews, security audits, finding bugs, checking code quality, establishing review standards,
   or giving feedback on code. Works on GitHub (gh) and GitLab (glab). Covers React 19, TypeScript,
-  Kotlin (Android and backend), modern C++, Qt/QML, modular-monolith module boundaries, and house-rules alignment (CLAUDE.md, ADRs, module docs).
+  Kotlin (Android and backend), Python, AWS Lambda/serverless (SAM, event sources, powertools), modern C++, Qt/QML,
+  modular-monolith module boundaries, and house-rules alignment (CLAUDE.md, ADRs, module docs).
 allowed-tools:
   - Read
   - Grep
@@ -47,7 +48,9 @@ must cite it (Phase 4).
 | **Kotlin (`.kt`/`.kts`, Android or backend)**                             | [Kotlin Guide](reference/kotlin.md)                                                       |
 | **C++ (`.cpp`/`.cc`/`.h`/`.hpp`)**                                        | [C++ Guide](reference/cpp.md)                                                             |
 | **Qt / QML (`.qml`, `QObject`/`Q_OBJECT`, `Qt::` APIs, Qt CMake)**        | [Qt & QML Guide](reference/qt-qml.md) — plus [C++ Guide](reference/cpp.md) if C++ changed |
-| **Other languages (Python, Go, Rust, Java, Vue, C, SQL, API design)**     | [Common Bugs Checklist](reference/common-bugs-checklist.md)                               |
+| **Python (`.py`)**                                                        | [Python Guide](reference/python.md)                                                       |
+| **AWS Lambda / serverless (handlers, SAM/CloudFormation `template.yaml`, `serverless.yml`, event source mappings, boto3, powertools)** | [AWS Lambda Guide](reference/aws-lambda.md) — plus [Python Guide](reference/python.md) if Python |
+| **Other languages (Go, Rust, Java, Vue, C, SQL, API design)**             | [Common Bugs Checklist](reference/common-bugs-checklist.md)                               |
 | **Auth, input handling, secrets, SQL, file uploads, external data**       | [Security Review Guide](reference/security-review-guide.md)                               |
 | **Loops over collections, DB queries, hot paths, large payloads**         | [Performance Review Guide](reference/performance-review-guide.md)                         |
 | **New abstractions, module/structural changes, modulith boundaries**      | [Architecture Review Guide](reference/architecture-review-guide.md)                       |

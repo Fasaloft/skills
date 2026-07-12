@@ -10,7 +10,7 @@ assets, and scripts.
 
 | Skill | Description |
 | --- | --- |
-| [`deep-review`](deep-review/SKILL.md) | Systematic, evidence-based PR/MR review. Host-agnostic (GitHub `gh` / GitLab `glab`); covers React 19, TypeScript, Kotlin, modern C++, Qt/QML, module boundaries, and house-rules alignment. |
+| [`deep-review`](deep-review/SKILL.md) | Systematic, evidence-based PR/MR review. Host-agnostic (GitHub `gh` / GitLab `glab`); covers React 19, TypeScript, Kotlin, Python, AWS Lambda/serverless, modern C++, Qt/QML, module boundaries, and house-rules alignment. |
 | [`university-project-review`](university-project-review/SKILL.md) | Two-phase review of a student's full-stack web app across 14 quality categories; writes findings to `REVIEW.md`. |
 
 ---

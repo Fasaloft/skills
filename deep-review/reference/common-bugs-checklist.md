@@ -1,6 +1,6 @@
 # Common Bugs Checklist
 
-Per-language bug patterns for stacks **without a dedicated guide**. TypeScript/JavaScript → [TypeScript Guide](typescript.md); React → [React Guide](react.md); Kotlin → [Kotlin Guide](kotlin.md); C++ → [C++ Guide](cpp.md); Qt/QML → [Qt & QML Guide](qt-qml.md); universal logic/resource/error checks → [Code Quality Guide](code-quality.md).
+Per-language bug patterns for stacks **without a dedicated guide**. TypeScript/JavaScript → [TypeScript Guide](typescript.md); React → [React Guide](react.md); Kotlin → [Kotlin Guide](kotlin.md); Python → [Python Guide](python.md); AWS Lambda/serverless → [AWS Lambda Guide](aws-lambda.md); C++ → [C++ Guide](cpp.md); Qt/QML → [Qt & QML Guide](qt-qml.md); universal logic/resource/error checks → [Code Quality Guide](code-quality.md).
 
 ## Vue 3
 
@@ -14,18 +14,6 @@ Per-language bug patterns for stacks **without a dedicated guide**. TypeScript/J
 - [ ] `withDefaults` object default values not using factory functions
 - [ ] Directly mutating props instead of emitting events
 - [ ] `watchEffect` with unclear dependencies causing over-triggering
-
-## Python
-
-- [ ] Mutable default arguments (`def f(x=[])`)
-- [ ] Bare `except:` catching `KeyboardInterrupt` and `SystemExit`
-- [ ] Shared mutable class attributes (`class C: items = []`)
-- [ ] Using `is` instead of `==` for value comparison
-- [ ] Forgetting `self` parameter in methods
-- [ ] Modifying list while iterating
-- [ ] String concatenation in loops (use `"".join()`)
-- [ ] Not closing files (use `with` statement)
-- [ ] Missing type annotations on public functions
 
 ## Rust
 
