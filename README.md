@@ -44,6 +44,32 @@ Performs a comprehensive, two-phase review of a university student's full-stack 
 
 ---
 
+### `deep-review`
+
+Performs a systematic, evidence-based review of a pull request or merge request. It is **host-agnostic**, working on both GitHub (`gh`) and GitLab (`glab`), and reviews changes against the repository's own house rules (CLAUDE.md, ADRs, module docs) rather than generic best practice alone.
+
+**Invocation:** Triggered when reviewing PRs/MRs or code changes — code review, architecture reviews, security audits, or bug finding.
+
+**How it works (four phases):**
+- **Phase 0 — Platform:** Detects the host from the git remote and loads the matching command map before running any host command.
+- **Phase 1 — Context:** Reads the PR description, linked issue, CI status, and the repo's house rules (`CLAUDE.md`, ADRs, module `BLUEPRINT.md`/`REQUIREMENTS.md`).
+- **Phase 2 — Load References (mandatory):** Inspects the diff and reads every matching reference guide (React, TypeScript, Kotlin, security, performance, architecture, etc.).
+- **Phase 3 — Review:** Assesses architecture and design first, then line-by-line for logic, security, performance, and maintainability.
+- **Phase 4 — Report:** Emits a strict-format report with a verdict, severity-grouped findings, a module coupling map (Mermaid), and the references used, then posts it as a single PR/MR comment.
+
+**Coverage:** React 19, TypeScript, Kotlin (Android and backend), modular-monolith module boundaries, and house-rules alignment.
+
+**Supporting files:**
+- `reference/` — the standards guides that carry the actual review criteria
+- `assets/` — the PR review template and quick checklist output contracts
+- `scripts/pr-analyzer.py` — optional triage helper for large diffs
+
+**Output:** A structured review comment posted to the PR/MR (verdict, findings by severity, coupling map, references used).
+
+**File:** [`deep-review/SKILL.md`](deep-review/SKILL.md)
+
+---
+
 ## Adding a New Skill
 
 To add a new skill:
@@ -66,8 +92,13 @@ To add a new skill:
 ```
 .
 ├── README.md                           # This file
+├── deep-review/
+│   ├── SKILL.md                        # Skill definition and workflows
+│   ├── assets/                         # Output templates (PR review template, checklist)
+│   ├── reference/                      # Standards guides (React, TypeScript, Kotlin, security, …)
+│   └── scripts/                        # Helper scripts (pr-analyzer.py)
 └── university-project-review/
-    └── SKILL.md                         # Skill definition and workflows
+    └── SKILL.md                        # Skill definition and workflows
 ```
 
 ---
