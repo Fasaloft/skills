@@ -1,6 +1,6 @@
 # Common Bugs Checklist
 
-Per-language bug patterns for stacks **without a dedicated guide**. TypeScript/JavaScript → [TypeScript Guide](typescript.md); React → [React Guide](react.md); Kotlin → [Kotlin Guide](kotlin.md); universal logic/resource/error checks → [Code Quality Guide](code-quality.md).
+Per-language bug patterns for stacks **without a dedicated guide**. TypeScript/JavaScript → [TypeScript Guide](typescript.md); React → [React Guide](react.md); Kotlin → [Kotlin Guide](kotlin.md); C++ → [C++ Guide](cpp.md); Qt/QML → [Qt & QML Guide](qt-qml.md); universal logic/resource/error checks → [Code Quality Guide](code-quality.md).
 
 ## Vue 3
 
@@ -86,14 +86,6 @@ Per-language bug patterns for stacks **without a dedicated guide**. TypeScript/J
 - [ ] Integer overflow in size calculations
 - [ ] Resource leaks (missing `free`, `fclose`, etc.)
 - [ ] Missing `static` on file-local functions/variables
-
-## C++
-
-- [ ] Missing RAII wrapper for resources
-- [ ] Violating Rule of 0/3/5 (destructor, copy, move)
-- [ ] Exception safety issues (no `noexcept` where applicable)
-- [ ] Dangling references from returned iterators or references
-- [ ] Unnecessary copies (missing `std::move` or pass-by-reference)
 
 ## SQL
 
